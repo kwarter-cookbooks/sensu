@@ -33,7 +33,8 @@ end
 
 [
   File.join(node.sensu.directory, "conf.d"),
-  node.sensu.log_directory
+  node.sensu.log_directory,
+  node.sensu.plugins_directory
 ].each do |dir|
   directory dir do
     recursive true
