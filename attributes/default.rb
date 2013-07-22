@@ -1,16 +1,16 @@
 # installation
-default.sensu.version = "0.9.11-1"
+default.sensu.version = "0.10.2-1"
 default.sensu.use_unstable_repo = false
 default.sensu.directory = "/etc/sensu"
 default.sensu.plugins_directory = "/etc/sensu/plugins"
 default.sensu.log_directory = "/var/log/sensu"
 default.sensu.use_ssl = true
 default.sensu.use_embedded_ruby = false
+default.sensu.service_max_wait = 10
 
 # rabbitmq
 default.sensu.rabbitmq.host = "localhost"
 default.sensu.rabbitmq.port = 5671
-default.sensu.rabbitmq.ssl = Mash.new
 default.sensu.rabbitmq.vhost = "/sensu"
 default.sensu.rabbitmq.user = "sensu"
 default.sensu.rabbitmq.password = "password"
@@ -21,6 +21,7 @@ default.sensu.redis.port = 6379
 
 # api
 default.sensu.api.host = "localhost"
+default.sensu.api.bind = "0.0.0.0"
 default.sensu.api.port = 4567
 
 # dashboard
