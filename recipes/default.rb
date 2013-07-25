@@ -25,21 +25,21 @@ ruby_block "sensu_service_trigger" do
 end
 
 case node.platform
-when "windows"
-  include_recipe "sensu::_windows"
-else
-  include_recipe "sensu::_linux"
+  when "windows"
+    include_recipe "sensu::_windows"
+  else
+    include_recipe "sensu::_linux"
 end
 
 [
-    directory node.sensu.log_directory,
-    directory node.sensu.plugins_directory
+    node.sensu.log_directory,
+    node.sensu.plugins_directory
 ].each do |dir|
   directory dir do
     owner "sensu"
     group "sensu"
     recursive true
-    mode 0750
+    mode 0755
   end
 end
 
@@ -51,8 +51,8 @@ directory File.join(node.sensu.directory, "conf.d") do
 end
 
 if node.sensu.use_ssl
-  node.override.sensu.rabbitmq.ssl = Mash.new
-  node.override.sensu.rabbitmq.ssl.cert_chain_file = File.join(node.sensu.directory, "ssl", "cert.pem")
+  node.override.sensu.rabbitmq.ssl                  = Mash.new
+  node.override.sensu.rabbitmq.ssl.cert_chain_file  = File.join(node.sensu.directory, "ssl", "cert.pem")
   node.override.sensu.rabbitmq.ssl.private_key_file = File.join(node.sensu.directory, "ssl", "key.pem")
 
   directory File.join(node.sensu.directory, "ssl")
