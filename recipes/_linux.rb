@@ -66,6 +66,13 @@ package "sensu" do
   notifies :create, "ruby_block[sensu_service_trigger]", :immediately
 end
 
+cookbook_file "/etc/init.d/sensu-service" do
+  source "sensu-service"
+  mode 0755
+  owner "root"
+  group "root"
+end
+
 template "/etc/default/sensu" do
   source "sensu.default.erb"
 end
