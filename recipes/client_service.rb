@@ -30,5 +30,5 @@ service "sensu-client" do
   provider service_provider
   supports :status => true, :restart => true
   action [:enable, :start]
-  subscribes :restart, resources("ruby_block[sensu_service_trigger]"), :delayed
+  #subscribes :restart, resources("ruby_block[sensu_service_trigger]"), :delayed
 end

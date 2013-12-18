@@ -21,7 +21,8 @@ package_options = ""
 
 case node.platform_family
 when "debian"
-  package_options = '--force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew"'
+  #package_options = '--force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew"'
+  package_options = '--force-yes'
 
   include_recipe "apt"
 
@@ -63,7 +64,7 @@ end
 package "sensu" do
   version node.sensu.version
   options package_options
-  notifies :create, "ruby_block[sensu_service_trigger]", :immediately
+  #notifies :create, "ruby_block[sensu_service_trigger]", :immediately
 end
 
 cookbook_file "/etc/init.d/sensu-service" do
