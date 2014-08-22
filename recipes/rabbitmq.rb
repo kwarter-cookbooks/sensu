@@ -17,6 +17,9 @@
 # limitations under the License.
 #
 
+include_recipe "rabbitmq"
+include_recipe "rabbitmq::mgmt_console"
+
 if node.sensu.use_ssl
   node.override.rabbitmq.ssl = true
   node.override.rabbitmq.ssl_port = node.sensu.rabbitmq.port
@@ -27,7 +30,7 @@ if node.sensu.use_ssl
     recursive true
   end
 
-  ssl = data_bag_item("sensu", "ssl")
+  ssl = Sensu::Helpers.data_bag_item("ssl")
 
   %w[
     cacert
@@ -44,26 +47,31 @@ if node.sensu.use_ssl
   end
 end
 
-include_recipe "rabbitmq"
-include_recipe "rabbitmq::mgmt_console"
-
 service "restart #{node.rabbitmq.service_name}" do
   service_name node.rabbitmq.service_name
   action :nothing
   subscribes :restart, resources("template[#{node.rabbitmq.config_root}/rabbitmq.config]"), :immediately
 end
 
-rabbitmq_vhost node.sensu.rabbitmq.vhost do
+rabbitmq = node.sensu.rabbitmq.to_hash
+
+config = Sensu::Helpers.data_bag_item("config", true)
+
+if config && config["rabbitmq"].is_a?(Hash)
+  rabbitmq = Chef::Mixin::DeepMerge.merge(rabbitmq, config["rabbitmq"])
+end
+
+rabbitmq_vhost rabbitmq["vhost"] do
   action :add
 end
 
-rabbitmq_user node.sensu.rabbitmq.user do
-  password node.sensu.rabbitmq.password
+rabbitmq_user rabbitmq["user"] do
+  password rabbitmq["password"]
   action :add
 end
 
-rabbitmq_user node.sensu.rabbitmq.user do
-  vhost node.sensu.rabbitmq.vhost
+rabbitmq_user rabbitmq["user"] do
+  vhost rabbitmq["vhost"]
   permissions ".* .* .*"
   action :set_permissions
 end

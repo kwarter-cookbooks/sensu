@@ -1,3 +1,5 @@
+require "openssl"
+
 module Sensu
   class Helpers
     class << self
@@ -7,9 +9,9 @@ module Sensu
         end
       end
 
-      def sanitize(hash)
+      def sanitize(raw_hash)
         sanitized = Hash.new
-        hash.each do |key, value|
+        raw_hash.each do |key, value|
           case value
           when Hash
             sanitized[key] = sanitize(value) unless value.empty?
@@ -28,6 +30,33 @@ module Sensu
         else
           "gem"
         end
+      end
+
+      def data_bag_item(item, missing_ok=false)
+        raw_hash = Chef::DataBagItem.load("sensu", item)
+        encrypted = raw_hash.detect do |key, value|
+          if value.is_a?(Hash)
+            value.has_key?("encrypted_data")
+          end
+        end
+        if encrypted
+          secret = Chef::EncryptedDataBagItem.load_secret
+          Chef::EncryptedDataBagItem.new(raw_hash, secret)
+        else
+          raw_hash
+        end
+      rescue Chef::Exceptions::ValidationFailed,
+        Chef::Exceptions::InvalidDataBagPath,
+        Net::HTTPServerException => error
+        missing_ok ? nil : raise(error)
+      end
+
+      def random_password(length=20)
+        password = ""
+        while password.length < length
+          password << ::OpenSSL::Random.random_bytes(1).gsub(/\W/, '')
+        end
+        password
       end
     end
   end

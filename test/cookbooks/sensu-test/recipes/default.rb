@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: sensu
-# Recipe:: dashboard_service
+# Cookbook Name:: sensu-test
+# Recipe:: default
 #
-# Copyright 2012, Sonian Inc.
+# Copyright 2013, Sonian, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,9 +17,29 @@
 # limitations under the License.
 #
 
-service "sensu-dashboard" do
-  provider node.platform_family =~ /debian/ ? Chef::Provider::Service::Init::Debian : Chef::Provider::Service::Init::Redhat
-  supports :status => true, :restart => true
-  action [:enable, :start]
-  subscribes :restart, resources("ruby_block[sensu_service_trigger]"), :delayed
+include_recipe "logrotate"
+
+include_recipe "sensu::default"
+
+sensu_client node.name do
+  address node["ipaddress"]
+  subscriptions ["all"]
+end
+
+sensu_check "test" do
+  command "true"
+  interval 10
+  subscribers ["all"]
+end
+
+include_recipe "sensu::rabbitmq"
+include_recipe "sensu::redis"
+include_recipe "sensu::server_service"
+include_recipe "sensu::api_service"
+include_recipe "sensu::client_service"
+
+# ServerSpec dependencies
+
+if platform?("ubuntu")
+  package "net-tools"
 end

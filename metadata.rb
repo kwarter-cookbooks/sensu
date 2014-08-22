@@ -4,7 +4,7 @@ maintainer_email "chefs@sonian.net"
 license          "Apache 2.0"
 description      "Installs/Configures Sensu"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "0.5.10"
+version          "2.0.0"
 
 # available @ http://community.opscode.com/cookbooks/apt
 depends "apt"
@@ -18,8 +18,8 @@ depends "windows", ">= 1.8.1"
 # available @ http://community.opscode.com/cookbooks/rabbitmq
 depends "rabbitmq", ">= 1.8.1"
 
-# available @ https://github.com/miah/chef-redis
-depends "redis", ">= 2.1.0"
+# available @ http://community.opscode.com/cookbooks/redisio
+depends "redisio", ">= 1.7.0"
 
 %w[
   ubuntu
@@ -27,6 +27,7 @@ depends "redis", ">= 2.1.0"
   centos
   redhat
   fedora
+  amazon
   windows
 ].each do |os|
   supports os
